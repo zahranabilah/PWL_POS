@@ -39,9 +39,17 @@ class UserController extends Controller
             abort(404);
         });*/
 
-        $user = UserModel::all();
+        $user = UserModel::firstOrNew(
+            [
+                'username' => 'manager33',
+                'nama' => 'Manager Tiga Tiga',
+                'password' => Hash::make('12345'),
+                'level_id' => 2
+            ],
+        );
+        $user->save();
         return view('user', ['data' => $user]);
-            
+        
 
     }
 }
