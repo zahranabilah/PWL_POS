@@ -271,6 +271,37 @@ class UserController extends Controller
     }
     return redirect('/');
 }
+    public function confirm_ajax(string $id)
+    {
+        $user = UserModel::with('level')->find($id);
+
+        return view('user.confirm_ajax', [
+            'user' => $user
+        ]);
+    }
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+
+            $user = UserModel::find($id);
+
+            if ($user) {
+                $user->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
 
 }
     /*public function tambah()
