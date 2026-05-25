@@ -65,6 +65,10 @@ public function store(Request $request) {
         'level_nama' => $request->level_nama,
     ]);
 
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json(['status' => true, 'message' => 'Data level berhasil disimpan']);
+    }
+
     return redirect('/level')->with('success', 'Data level berhasil disimpan');
 }
 public function show(string $id)

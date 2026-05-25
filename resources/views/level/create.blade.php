@@ -6,7 +6,7 @@
         <h3 class="card-title">Tambah Level</h3>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ url('level') }}" class="form-horizontal">
+        <form id="form-level" method="POST" action="{{ url('level') }}" class="form-horizontal">
             @csrf
             <div class="form-group row">
                 <label class="col-1 control-label col-form-label">Kode Level</label>
@@ -32,4 +32,40 @@
         </form>
     </div>
 </div>
+
+@push('js')
+<script>
+$(function(){
+    var $form = $('#form-level');
+    function submitAjax(form){
+        $('[id^="error-"]').html('');
+        $.ajax({
+            url: form.action,
+            type: form.method,
+            data: $(form).serialize(),
+            success: function(resp){
+                if(resp.status){
+                    Swal.fire({icon:'success',title:'Berhasil',text:resp.message});
+                    setTimeout(function(){ window.location = '{{ url("level") }}'; },800);
+                } else {
+                    if(resp.msgField){ $.each(resp.msgField,function(k,v){ var $el=$('[name="'+k+'"]'); $el.closest('.form-group').find('.text-danger, .invalid-feedback').remove(); $el.closest('.form-group').append('<small class="form-text text-danger">'+v[0]+'</small>'); }); }
+                }
+            },
+            error:function(){ Swal.fire({icon:'error',title:'Gagal',text:'Terjadi kesalahan'}); }
+        });
+    }
+
+    if ($.isFunction($.fn.validate)){
+        $form.validate({
+            rules: { level_kode: { required:true }, level_nama: { required:true } },
+            errorPlacement:function(error,element){ element.closest('.form-group').find('.text-danger, .invalid-feedback').remove(); element.closest('.form-group').append('<small class="form-text text-danger">'+error.text()+'</small>'); },
+            submitHandler:function(form){ submitAjax(form); return false; }
+        });
+    } else {
+        $form.on('submit', function(e){ e.preventDefault(); submitAjax(this); });
+    }
+});
+</script>
+@endpush
+
 @endsection

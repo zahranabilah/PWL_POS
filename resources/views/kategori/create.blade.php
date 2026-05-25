@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">{{ $page->title }}</h3>
     </div>
-    <form method="POST" action="{{ url('kategori') }}" class="form-horizontal">
+    <form id="form-kategori" method="POST" action="{{ url('kategori') }}" class="form-horizontal">
         <div class="card-body">
             @csrf
             <div class="form-group row">
@@ -33,4 +33,19 @@
         </div>
     </form>
 </div>
+
+@push('js')
+<script>
+$(function(){
+    var $form = $('#form-kategori');
+    function submitAjax(form){
+        $.ajax({ url: form.action, type: form.method, data: $(form).serialize(), success: function(resp){ if(resp.status){ Swal.fire({icon:'success',title:'Berhasil',text:resp.message}); setTimeout(function(){ window.location='{{ url("kategori") }}'; },800); } else { if(resp.msgField){ $.each(resp.msgField,function(k,v){ var $el=$('[name="'+k+'"]'); $el.closest('.form-group').find('.text-danger, .invalid-feedback').remove(); $el.closest('.form-group').append('<small class="form-text text-danger">'+v[0]+'</small>'); }); } } }, error:function(){ Swal.fire({icon:'error',title:'Gagal',text:'Terjadi kesalahan'}); } }); }
+
+    if ($.isFunction($.fn.validate)){
+        $form.validate({ rules: { kategori_kode:{required:true}, kategori_nama:{required:true} }, errorPlacement:function(error,element){ element.closest('.form-group').find('.text-danger, .invalid-feedback').remove(); element.closest('.form-group').append('<small class="form-text text-danger">'+error.text()+'</small>'); }, submitHandler:function(form){ submitAjax(form); return false; } });
+    } else { $form.on('submit', function(e){ e.preventDefault(); submitAjax(this); }); }
+});
+</script>
+@endpush
+
 @endsection

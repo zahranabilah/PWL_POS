@@ -73,6 +73,10 @@ class SupplierController extends Controller
             'supplier_alamat' => $request->supplier_alamat,
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Data supplier berhasil disimpan']);
+        }
+
         return redirect('/supplier')->with('success', 'Data supplier berhasil disimpan');
     }
 

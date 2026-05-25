@@ -88,6 +88,10 @@ class BarangController extends Controller
             'harga_jual' => $request->harga_jual
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Data barang berhasil ditambahkan']);
+        }
+
         return redirect('/barang')->with('success', 'Data barang berhasil ditambahkan');
     }
 

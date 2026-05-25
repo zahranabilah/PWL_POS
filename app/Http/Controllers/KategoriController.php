@@ -71,6 +71,10 @@ class KategoriController extends Controller
             'kategori_nama' => $request->kategori_nama
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['status' => true, 'message' => 'Data kategori berhasil ditambahkan']);
+        }
+
         return redirect('/kategori')->with('success', 'Data kategori berhasil ditambahkan');
     }
 
