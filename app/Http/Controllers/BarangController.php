@@ -21,14 +21,20 @@ class BarangController extends Controller
         ];
 
         $activeMenu = 'barang'; // set menu yang sedang aktif
+        
+        $kategori = KategoriModel::all();
 
-        return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
+        return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori' => $kategori, 'activeMenu' => $activeMenu]);
     }
 
     // Ambil data barang dalam bentuk json untuk datatables 
     public function list(Request $request)
     {
         $barangs = BarangModel::with('kategori')->select('barang_id', 'kategori_id', 'barang_kode', 'barang_nama', 'harga_beli', 'harga_jual');
+
+        if ($request->kategori_id) {
+            $barangs->where('kategori_id', $request->kategori_id);
+        }
 
         return DataTables::of($barangs)
             ->addIndexColumn() 
@@ -71,7 +77,7 @@ class BarangController extends Controller
             'barang_kode' => 'required|string|unique:m_barang,barang_kode',
             'barang_nama' => 'required|string',
             'harga_beli' => 'required|integer|min:0',
-            'harga_jual' => 'required|integer|min:0'
+            'harga_jual' => 'required|integer|min:100000'
         ]);
 
         BarangModel::create([

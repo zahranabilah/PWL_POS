@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\LevelModel;
 use Yajra\DataTables\Facades\DataTables;
 
-
 class LevelController extends Controller
 {
     public function index()
@@ -67,6 +66,60 @@ public function store(Request $request) {
     ]);
 
     return redirect('/level')->with('success', 'Data level berhasil disimpan');
+}
+public function show(string $id)
+{
+    $level = LevelModel::find($id);
+
+    $breadcrumb = (object) [
+        'title' => 'Detail Level',
+        'list' => ['Home', 'Level', 'Detail']
+    ];
+
+    $page = (object) [
+        'title' => 'Detail Level'
+    ];
+
+    $activeMenu = 'level';
+    return view('level.show', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
+}
+
+public function edit(string $id)
+{
+    $level = LevelModel::find($id);
+
+    $breadcrumb = (object) [
+        'title' => 'Edit Level',
+        'list' => ['Home', 'Level', 'Edit']
+    ];
+
+    $page = (object) [
+        'title' => 'Edit Level'
+    ];
+
+    $activeMenu = 'level';
+
+    return view('level.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
+}
+
+public function update(Request $request, string $id)
+{
+    $request->validate([
+        'level_kode' => 'required|string|unique:m_level,level_kode,' . $id . ',level_id',
+        'level_nama' => 'required|string|max:100',
+    ]);
+
+    $level = LevelModel::find($id);
+    if (!$level) {
+        return redirect('/level')->with('error', 'Data level tidak ditemukan');
+    }
+
+    $level->update([
+        'level_kode' => $request->level_kode,
+        'level_nama' => $request->level_nama,
+    ]);
+
+    return redirect('/level')->with('success', 'Data level berhasil diubah');
 }
 public function destroy(string $id) {
     $check = LevelModel::find($id);

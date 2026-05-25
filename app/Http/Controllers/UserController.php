@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\UserModel;
 use App\Models\LevelModel;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -174,6 +175,44 @@ class UserController extends Controller
             );
         }
     }
+    public function create_ajax()
+    {
+        $level = LevelModel::select('level_id', 'level_nama')->get();
+
+        return view('user.create_ajax', ['level' => $level]);
+    }
+    public function store_ajax(Request $request)
+{
+    if ($request->ajax() || $request->wantsJson()) {
+
+        $rules = [
+            'level_id' => 'required|integer',
+            'username' => 'required|max:20|unique:m_user,username',
+            'nama' => 'required|max:100',
+            'password' => 'required|min:6|max:20'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        UserModel::create($request->all());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data berhasil disimpan'
+        ]);
+    }
+
+    return redirect('/user')->with('error', 'Permintaan harus melalui AJAX');
+}
+
 }
     /*public function tambah()
     {
