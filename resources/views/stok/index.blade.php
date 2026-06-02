@@ -32,7 +32,7 @@
 @push('js')
 <script>
     $(document).ready(function() {
-        $('#table_stok').DataTable({
+        window.dataStok = $('#table_stok').DataTable({
             serverSide: true,
             ajax: {
                 url: "{{ url('stok/list') }}",
@@ -52,5 +52,13 @@
             ]
         });
     });
+
+    function modalAction(url = '') {
+        $('#myModal').load(url, function () {
+            $('#myModal').modal('show');
+        });
+    }
 </script>
 @endpush
+
+<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>

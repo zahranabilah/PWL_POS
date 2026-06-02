@@ -9,6 +9,15 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\AuthController;
+
+Route::pattern('id', '[0-9]+');
+
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'postlogin']);
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+route::middleware('auth')->group(function () {
 
 // Route::get('/', function () {
 //     return view('user.index'); // Pastikan ini mengarah ke file yang benar
@@ -123,11 +132,29 @@ Route::group(['prefix' => 'supplier'], function () {
 Route::group(['prefix' => 'stok'], function () {
     Route::get('/', [StokController::class, 'index']);
     Route::post('/list', [StokController::class, 'list']);
+    
+    // AJAX Form
+    Route::get('/create_ajax', [StokController::class, 'create_ajax']);
+    Route::post('/ajax', [StokController::class, 'store_ajax']);
+    Route::get('/{id}/show_ajax', [StokController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [StokController::class, 'edit_ajax']);
+    Route::put('/{id}/update_ajax', [StokController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']);
+    Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']);
 });
 
 Route::group(['prefix' => 'penjualan'], function () {
     Route::get('/', [PenjualanController::class, 'index']);
     Route::post('/list', [PenjualanController::class, 'list']);
+    
+    // AJAX Form
+    Route::get('/create_ajax', [PenjualanController::class, 'create_ajax']);
+    Route::post('/ajax', [PenjualanController::class, 'store_ajax']);
+    Route::get('/{id}/show_ajax', [PenjualanController::class, 'show_ajax']);
+    Route::get('/{id}/edit_ajax', [PenjualanController::class, 'edit_ajax']);
+    Route::put('/{id}/update_ajax', [PenjualanController::class, 'update_ajax']);
+    Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax']);
+    Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax']);
 });
 
 Route::get('/level', [LevelController::class, 'index']);
@@ -138,3 +165,5 @@ Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan']);
 Route::get('/user/ubah/{id}', [UserController::class, 'ubah']);
 Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
+
+});
