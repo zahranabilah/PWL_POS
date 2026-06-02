@@ -18,23 +18,17 @@ class AuthController extends Controller
 
     public function postlogin(Request $request)
     {
-        if ($request->ajax() || $request->wantsJson()) {
+        $credentials = $request->only('username', 'password');
 
-            $credentials = $request->only('username', 'password');
+        // Autentikasi manual agar cocok dengan skema m_user (username + password hash bcrypt)
+        $user = \App\Models\UserModel::where('username', $credentials['username'] ?? null)->first();
 
-            // Autentikasi manual agar cocok dengan skema m_user (username + password hash bcrypt)
-            $user = \App\Models\UserModel::where('username', $credentials['username'] ?? null)->first();
+        $loginSucceeded = $user && \Illuminate\Support\Facades\Hash::check($credentials['password'] ?? '', $user->password);
 
-            // Debug cepat bila login gagal (bisa dibuka dari response JSON)
-            // $ok = $user ? \Illuminate\Support\Facades\Hash::check($credentials['password'] ?? '', $user->password) : false;
-            // return response()->json(['status'=>false,'message'=>'DEBUG','ok'=>$ok]);
+        if ($loginSucceeded) {
+            Auth::login($user);
 
-            if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'] ?? '', $user->password)) {
-                Auth::login($user);
-
-
-
-
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'status' => true,
                     'message' => 'Login Berhasil',
@@ -42,13 +36,17 @@ class AuthController extends Controller
                 ]);
             }
 
+            return redirect('/');
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Login Gagal'
             ]);
         }
 
-        return redirect('login');
+        return redirect('login')->with('error', 'Login Gagal');
     }
 
     public function logout(Request $request)
