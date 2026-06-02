@@ -88,7 +88,7 @@
                 "type": "POST",
                 "data": function(d) {
                     d.level_id = $('#level_id').val();
-                }
+                },
             },
             columns: [
                 {

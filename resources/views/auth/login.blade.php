@@ -106,6 +106,10 @@
 
             </form>
 
+            <p class="mt-3 mb-0 text-center">
+                <a href="{{ url('register') }}">Belum punya akun? Daftar di sini</a>
+            </p>
+
         </div>
 
     </div>

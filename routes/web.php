@@ -16,6 +16,11 @@ Route::pattern('id', '[0-9]+');
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+// Public registration (creates user with STF role)
+Route::get('register', [AuthController::class, 'register'])->name('register');
+Route::post('register', [AuthController::class, 'postRegister']);
 
 route::middleware('auth')->group(function () {
 
@@ -87,27 +92,29 @@ Route::group(['prefix' => 'kategori'], function () {
     Route::delete('/{id}', [KategoriController::class, 'destroy']);
 });
 
-Route::group(['prefix' => 'barang'], function () {
-    Route::get('/', [BarangController::class, 'index']);
-    Route::post('/list', [BarangController::class, 'list']);
+Route::middleware(['authorize:ADM,MNG'])->group(function() {
+    Route::group(['prefix' => 'barang'], function () {
+        Route::get('/', [BarangController::class, 'index']);
+        Route::post('/list', [BarangController::class, 'list']);
 
-    // Non-AJAX
-    Route::get('/create', [BarangController::class, 'create']);
-    Route::post('/', [BarangController::class, 'store']);
+        // Non-AJAX
+        Route::get('/create', [BarangController::class, 'create']);
+        Route::post('/', [BarangController::class, 'store']);
 
-    // AJAX Form
-    Route::get('/create_ajax', [BarangController::class, 'create_ajax']);
-    Route::post('/ajax', [BarangController::class, 'store_ajax']);
-    Route::get('/{id}/edit_ajax', [BarangController::class, 'edit_ajax']);
-    Route::put('/{id}/update_ajax', [BarangController::class, 'update_ajax']);
-    Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
-    Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
+        // AJAX Form
+        Route::get('/create_ajax', [BarangController::class, 'create_ajax']);
+        Route::post('/ajax', [BarangController::class, 'store_ajax']);
+        Route::get('/{id}/edit_ajax', [BarangController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [BarangController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
 
-    // Detail/Edit/Delete Non-AJAX
-    Route::get('/{id}', [BarangController::class, 'show']);
-    Route::get('/{id}/edit', [BarangController::class, 'edit']);
-    Route::put('/{id}', [BarangController::class, 'update']);
-    Route::delete('/{id}', [BarangController::class, 'destroy']);
+        // Detail/Edit/Delete Non-AJAX
+        Route::get('/{id}', [BarangController::class, 'show']);
+        Route::get('/{id}/edit', [BarangController::class, 'edit']);
+        Route::put('/{id}', [BarangController::class, 'update']);
+        Route::delete('/{id}', [BarangController::class, 'destroy']);
+    });
 });
 
 Route::group(['prefix' => 'supplier'], function () {

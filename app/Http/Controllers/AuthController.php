@@ -27,6 +27,7 @@ class AuthController extends Controller
 
         if ($loginSucceeded) {
             Auth::login($user);
+            $request->session()->regenerate();
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -47,6 +48,37 @@ class AuthController extends Controller
         }
 
         return redirect('login')->with('error', 'Login Gagal');
+    }
+
+    public function register()
+    {
+        if (Auth::check()) {
+            return redirect('/');
+        }
+
+        return view('auth.register');
+    }
+
+    public function postRegister(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|min:3|unique:m_user,username',
+            'nama' => 'required|string|max:100',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        // set level to STF (staff)
+        $level = \App\Models\LevelModel::where('level_kode', 'STF')->first();
+        $level_id = $level ? $level->level_id : 3; // fallback to 3
+
+        \App\Models\UserModel::create([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => bcrypt($request->password),
+            'level_id' => $level_id
+        ]);
+
+        return redirect('login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
 
     public function logout(Request $request)

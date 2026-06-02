@@ -47,18 +47,20 @@ class UserModel extends Authenticatable
     {
         return $this->level->level_nama === $role;
     }
-    /**
-     * Pastikan Laravel menggunakan nama user/password sesuai tabel m_user.
-     */
-    public function getAuthIdentifierName(): string
+    public function getRole()
     {
-        return 'username';
+        return $this->level->level_kode;
     }
 
     /**
-     * Karena primary key tabel adalah user_id, Identifiernya tetap username
-     * (untuk kondisi Auth::attempt(['username'=>..., 'password'=>...])).
+     * Laravel harus menyimpan identifier session berdasarkan primary key
+     * karena Eloquent user provider mencari user dengan primary key.
      */
+    public function getAuthIdentifierName(): string
+    {
+        return $this->getKeyName();
+    }
+
     public function getAuthPassword(): string
     {
         return (string) $this->password;
