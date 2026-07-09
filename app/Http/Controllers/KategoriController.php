@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\KategoriModel;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KategoriController extends Controller
 {
@@ -21,8 +22,9 @@ class KategoriController extends Controller
         ];
 
         $activeMenu = 'kategori'; // set menu yang sedang aktif
+        $kategori = KategoriModel::all();
 
-        return view('kategori.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
+        return view('kategori.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'kategori' => $kategori]);
     }
 
     // Ambil data kategori dalam bentuk json untuk datatables 
@@ -100,6 +102,18 @@ class KategoriController extends Controller
         }
 
         return redirect('/kategori')->with('error', 'Permintaan harus melalui AJAX');
+    }
+
+    public function export_pdf()
+    {
+        $kategoris = KategoriModel::select('kategori_kode', 'kategori_nama')
+            ->orderBy('kategori_kode')
+            ->get();
+
+        $pdf = Pdf::loadView('kategori.export_pdf', compact('kategoris'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data Kategori '.date('Y-m-d_H-i-s').'.pdf');
     }
 
     public function show_ajax($id)

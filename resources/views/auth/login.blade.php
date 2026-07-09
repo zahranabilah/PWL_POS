@@ -86,7 +86,7 @@
                     <div class="col-8">
                         <div class="icheck-primary">
 
-                            <input type="checkbox" id="remember">
+                            <input type="checkbox" id="remember" name="remember">
 
                             <label for="remember">
                                 Remember Me
@@ -152,44 +152,6 @@
                     minlength: 6,
                     maxlength: 20
                 }
-            },
-
-            submitHandler: function (form) {
-
-                $.ajax({
-
-                    url: form.action,
-                    type: form.method,
-                    data: $(form).serialize(),
-
-                    success: function (response) {
-
-                        if (response.status) {
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil',
-                                text: response.message,
-                            }).then(function () {
-
-                                window.location = response.redirect;
-
-                            });
-
-                        } else {
-
-                            $('.error-text').text('');
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan',
-                                text: response.message
-                            });
-                        }
-                    }
-                });
-
-                return false;
             },
 
             errorElement: 'span',

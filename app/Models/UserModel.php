@@ -24,6 +24,7 @@ class UserModel extends Authenticatable
         'username',
         'nama',
         'password',
+        'profile_photo',
         'created_at',
         'updated_at'
     ];
@@ -31,6 +32,15 @@ class UserModel extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+    public function getProfilePhotoUrl(): string
+    {
+        if ($this->profile_photo) {
+            return asset('storage/' . $this->profile_photo);
+        }
+
+        return asset('adminlte/dist/img/user2-160x160.jpg');
+    }
 
     public $timestamps = true;
 

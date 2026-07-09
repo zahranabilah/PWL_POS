@@ -18,15 +18,27 @@ class AuthController extends Controller
 
     public function postlogin(Request $request)
     {
+        $request->validate([
+            'username' => 'required|string|min:3|max:50',
+            'password' => 'required|string|min:6|max:50',
+        ]);
+
         $credentials = $request->only('username', 'password');
+        $remember = $request->boolean('remember');
 
-        // Autentikasi manual agar cocok dengan skema m_user (username + password hash bcrypt)
-        $user = \App\Models\UserModel::where('username', $credentials['username'] ?? null)->first();
+        $loginSucceeded = false;
 
-        $loginSucceeded = $user && \Illuminate\Support\Facades\Hash::check($credentials['password'] ?? '', $user->password);
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            $loginSucceeded = true;
+        } else {
+            $user = \App\Models\UserModel::where('username', $credentials['username'])->first();
+            if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'] ?? '', $user->password)) {
+                Auth::guard('web')->login($user, $remember);
+                $loginSucceeded = true;
+            }
+        }
 
         if ($loginSucceeded) {
-            Auth::login($user);
             $request->session()->regenerate();
 
             if ($request->ajax() || $request->wantsJson()) {

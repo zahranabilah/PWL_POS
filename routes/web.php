@@ -30,10 +30,16 @@ route::middleware('auth')->group(function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/profile', [UserController::class, 'updateProfile']);
+});
+
 Route::middleware(['authorize:ADM'])->group(function() {
     Route::group(['prefix' => 'user'], function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/list', [UserController::class, 'list']);
+        Route::get('/export_pdf', [UserController::class, 'export_pdf']);
         Route::get('/create', [UserController::class, 'create']);
         Route::post('/', [UserController::class, 'store']);
         Route::get('/create_ajax', [UserController::class, 'create_ajax']);
@@ -53,6 +59,7 @@ Route::middleware(['authorize:ADM'])->group(function() {
 Route::group(['prefix' => 'level'], function () {
     Route::get('/', [LevelController::class, 'index']);          // halaman awal
     Route::post('/list', [LevelController::class, 'list']);      // data json untuk datatables
+    Route::get('/export_pdf', [LevelController::class, 'export_pdf']);
     Route::get('/create', [LevelController::class, 'create']);    // form tambah
     Route::post('/', [LevelController::class, 'store']);         // simpan data baru
 
@@ -74,6 +81,7 @@ Route::group(['prefix' => 'level'], function () {
 Route::group(['prefix' => 'kategori'], function () {
     Route::get('/', [KategoriController::class, 'index']);
     Route::post('/list', [KategoriController::class, 'list']);
+    Route::get('/export_pdf', [KategoriController::class, 'export_pdf']);
     Route::get('/create', [KategoriController::class, 'create']);
     Route::post('/', [KategoriController::class, 'store']);
 
@@ -96,11 +104,13 @@ Route::middleware(['authorize:ADM,MNG'])->group(function() {
     Route::group(['prefix' => 'barang'], function () {
         Route::get('/', [BarangController::class, 'index']);
         Route::post('/list', [BarangController::class, 'list']);
-
+        Route::get('/import', [BarangController::class, 'import']);
+        Route::post('/import_ajax', [BarangController::class, 'import_ajax']);
+        Route::get('/export_excel', [BarangController::class, 'export_excel']);
+        Route::get('/export_pdf', [BarangController::class, 'export_pdf']);
         // Non-AJAX
         Route::get('/create', [BarangController::class, 'create']);
         Route::post('/', [BarangController::class, 'store']);
-
         // AJAX Form
         Route::get('/create_ajax', [BarangController::class, 'create_ajax']);
         Route::post('/ajax', [BarangController::class, 'store_ajax']);
@@ -108,7 +118,6 @@ Route::middleware(['authorize:ADM,MNG'])->group(function() {
         Route::put('/{id}/update_ajax', [BarangController::class, 'update_ajax']);
         Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
-
         // Detail/Edit/Delete Non-AJAX
         Route::get('/{id}', [BarangController::class, 'show']);
         Route::get('/{id}/edit', [BarangController::class, 'edit']);
@@ -120,6 +129,7 @@ Route::middleware(['authorize:ADM,MNG'])->group(function() {
 Route::group(['prefix' => 'supplier'], function () {
     Route::get('/', [SupplierController::class, 'index']);
     Route::post('/list', [SupplierController::class, 'list']);
+    Route::get('/export_pdf', [SupplierController::class, 'export_pdf']);
     Route::get('/create', [SupplierController::class, 'create']);
     Route::post('/', [SupplierController::class, 'store']);
 
@@ -141,6 +151,7 @@ Route::group(['prefix' => 'supplier'], function () {
 Route::group(['prefix' => 'stok'], function () {
     Route::get('/', [StokController::class, 'index']);
     Route::post('/list', [StokController::class, 'list']);
+    Route::get('/export_pdf', [StokController::class, 'export_pdf']);
     
     // AJAX Form
     Route::get('/create_ajax', [StokController::class, 'create_ajax']);
@@ -155,6 +166,7 @@ Route::group(['prefix' => 'stok'], function () {
 Route::group(['prefix' => 'penjualan'], function () {
     Route::get('/', [PenjualanController::class, 'index']);
     Route::post('/list', [PenjualanController::class, 'list']);
+    Route::get('/export_pdf', [PenjualanController::class, 'export_pdf']);
     
     // AJAX Form
     Route::get('/create_ajax', [PenjualanController::class, 'create_ajax']);

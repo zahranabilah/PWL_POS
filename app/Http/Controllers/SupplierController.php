@@ -6,6 +6,7 @@ use App\Models\SupplierModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -161,6 +162,18 @@ class SupplierController extends Controller
         }
 
         return redirect('/supplier')->with('error', 'Permintaan harus melalui AJAX');
+    }
+
+    public function export_pdf()
+    {
+        $suppliers = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->orderBy('supplier_kode')
+            ->get();
+
+        $pdf = Pdf::loadView('supplier.export_pdf', compact('suppliers'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data Supplier '.date('Y-m-d_H-i-s').'.pdf');
     }
 
     public function show(string $id)

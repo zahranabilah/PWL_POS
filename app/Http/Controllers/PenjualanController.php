@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenjualanController extends Controller
 {
@@ -173,5 +174,23 @@ class PenjualanController extends Controller
         }
 
         return redirect('/penjualan');
+    }
+
+    public function export_pdf()
+    {
+        $penjualans = DB::table('t_penjualan')
+            ->select(
+                'penjualan_id',
+                'penjualan_kode',
+                'penjualan_tanggal',
+                DB::raw('(select count(*) from t_penjualan_detail where t_penjualan_detail.penjualan_id = t_penjualan.penjualan_id) as jumlah_item')
+            )
+            ->orderBy('penjualan_tanggal', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('penjualan.export_pdf', compact('penjualans'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data Penjualan '.date('Y-m-d_H-i-s').'.pdf');
     }
 }

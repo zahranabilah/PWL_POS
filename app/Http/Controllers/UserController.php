@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\UserModel;
 use App\Models\LevelModel;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -141,6 +143,57 @@ class UserController extends Controller
         $activeMenu = 'user'; // set menu yang sedang aktif
 
         return view('user.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'user' => $user, 'level' => $level, 'activeMenu' => $activeMenu]);
+    }
+
+    public function profile()
+    {
+        $user = auth()->user();
+
+        $breadcrumb = (object) [
+            'title' => 'Profil Saya',
+            'list' => ['Home', 'Profil']
+        ];
+
+        $page = (object) [
+            'title' => 'Ubah Foto Profile dan Informasi Akun'
+        ];
+
+        $activeMenu = 'profile';
+
+        return view('user.profile', compact('user', 'breadcrumb', 'page', 'activeMenu'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'nama' => 'required|string|max:100',
+            'password' => 'nullable|min:5',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $data = [
+            'nama' => $request->nama,
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        if ($request->hasFile('profile_photo')) {
+            $photoPath = $request->file('profile_photo')->store('profile_photos', 'public');
+
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $data['profile_photo'] = $photoPath;
+        }
+
+        $user->update($data);
+
+        return redirect('/profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     // Menyimpan perubahan data user
@@ -303,6 +356,18 @@ class UserController extends Controller
         return redirect('/');
     }
 
+    public function export_pdf()
+    {
+        $users = UserModel::with('level')
+            ->select('user_id', 'username', 'nama', 'level_id')
+            ->orderBy('username')
+            ->get();
+
+        $pdf = Pdf::loadView('user.export_pdf', compact('users'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data User '.date('Y-m-d_H-i-s').'.pdf');
+    }
 }
     /*public function tambah()
     {

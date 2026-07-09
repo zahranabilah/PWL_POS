@@ -134,6 +134,17 @@
       </li>
 
       @auth
+        <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+            <img src="{{ auth()->user()->getProfilePhotoUrl() }}" alt="User Avatar" class="img-circle elevation-2" style="width:30px; height:30px; object-fit:cover;">
+            <span class="ml-1">{{ auth()->user()->nama }}</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right p-0">
+            <a href="{{ url('profile') }}" class="dropdown-item">
+              <i class="fas fa-user mr-2"></i> Profil Saya
+            </a>
+          </div>
+        </li>
         <li class="nav-item">
           <form action="{{ url('logout') }}" method="POST" class="d-inline">
             @csrf

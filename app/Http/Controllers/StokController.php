@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StokController extends Controller
 {
@@ -186,5 +187,25 @@ class StokController extends Controller
         }
 
         return redirect('/stok');
+    }
+
+    public function export_pdf()
+    {
+        $stoks = DB::table('t_stok')
+            ->join('m_barang', 't_stok.barang_id', '=', 'm_barang.barang_id')
+            ->select(
+                't_stok.stok_id',
+                't_stok.stok_tanggal',
+                't_stok.stok_jumlah',
+                'm_barang.barang_kode',
+                'm_barang.barang_nama'
+            )
+            ->orderBy('t_stok.stok_tanggal', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('stok.export_pdf', compact('stoks'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data Stok '.date('Y-m-d_H-i-s').'.pdf');
     }
 }

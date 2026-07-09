@@ -5,6 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">{{ $page->title }}</h3>
         <div class="card-tools">
+            <button type="button" class="btn btn-sm btn-primary mt-1" onclick="window.location.href='{{ url('user/export_pdf') }}'">Export PDF</button>
             <button onclick="modalAction('{{ url('/user/create_ajax') }}')" 
                 class="btn btn-sm btn-success mt-1">
                 Tambah Ajax

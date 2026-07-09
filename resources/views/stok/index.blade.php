@@ -4,6 +4,9 @@
 <div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">{{ $page->title }}</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-sm btn-primary mt-1" onclick="window.location.href='{{ url('stok/export_pdf') }}'">Export PDF</button>
+        </div>
     </div>
     <div class="card-body">
         @if (session('success'))

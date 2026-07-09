@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\LevelModel;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LevelController extends Controller
 {
@@ -153,6 +154,18 @@ public function store(Request $request) {
         }
 
         return redirect('/level')->with('error', 'Permintaan harus melalui AJAX');
+    }
+
+    public function export_pdf()
+    {
+        $levels = LevelModel::select('level_kode', 'level_nama')
+            ->orderBy('level_kode')
+            ->get();
+
+        $pdf = Pdf::loadView('level.export_pdf', compact('levels'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Data Level '.date('Y-m-d_H-i-s').'.pdf');
     }
 
     public function show(string $id)
